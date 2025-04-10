@@ -27,35 +27,64 @@ class GestionnaireContacts {
     Contac* teteListe;
     Contact* racineArbre;
 
+    Contact* rechercheDsArbre(Contact* racine, const char*nom){
+        //Si arbre vide
+        if(!racine) return nullptr;
+
+        //sinon on compare les nom
+        int cpt= strcmp(nom,racine->nom);
+        //Si bon nom
+        if (cpt==0) return racine;
+        //Sinon on cherche l'enfant droit ou gache
+        return rechercheArbre(cmp<0 ? racine->gauche : racine->droite, nom);
+    }
+
+    void supprimerContact(Contact *aSupprimer){
+        //recherche dans l'arbre
+        Contact *supprimer = rechercheDsArbre(racineArbre,nom);
+        if (!supprimer){
+            return false
+        }
+
+        //supprimer dans la liste
+        if (aSupprimer->precedent){
+            aSupprimer->precedent->suivant=aSupprimer->suivant;
+        }
+        if (aSupprimer->suivant){
+            aSupprimer->suivant->precedent=aSupprimer->precedent;
+        }
+        delete aSupprimer;
+    }
+
+    void supprimerContact(Contact *aSupprimer){
+        if (!teteListe || !aSupprimer) return;
+        
+    }
+
+
     public:
     GestionnaireContacts() : teteListe(nullptr), racineArbre(nullptr) {}
     
-    void ajouterContact(const char* nom, const char* prenom, const char* mail){
+    void ajouterContact(const char* nom, const char* prenom, const char* mail, const char* telephone){
 
         // creation contact
         Contact* c = new Contact();
-        strcpy(nouveau->nom = nom);
-        strcpy(nouveau->prenom = prenom);
-        strcpy(nouveau->mail = mail);
+        strncpy(nouveau->nom = nom, 49);
+        strncpy(nouveau->prenom = prenom, 49);
+        strncpy(nouveau->mail = mail, 99);
+        strncpy(nouveau->telephone = mail, 14);
+        nouveau->gauche= nouveau->droit= nouveau->suivant=nullptr;
 
-        //ajout tete de la lisre et insertion dans l'arbre
+        //ajout tete de la liste et insertion dans l'arbre
         nouveau->suivant= teteListe;
         teteliste=nouveau;
 
-        insertionDsArbre(racine,nouveau);
+        insertionDsArbre(racineArbre,nouveau);
 
        
     } 
 
-    void supprimerContact(Contact *aSupprimer){
-            if (aSupprimer->precedent){
-                aSupprimer->precedent->suivant=aSupprimer->suivant;
-            }
-            if (aSupprimer->suivant){
-                aSupprimer->suivant->precedent=aSupprimer->precedent;
-            }
-            delete aSupprimer;
-        }
+
       
     // insertion avec recursivité    
     void insererDsArbre(Contact *&racine,Contact *nouveau){
