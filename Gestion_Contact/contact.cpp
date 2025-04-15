@@ -131,7 +131,7 @@ class GestionnaireContacts {
     void insererDsArbre(Contact *&racine,Contact *nouveau){
             //Si arbre vide
             if (racine=nullptr){
-                racine=nouveau
+                racine=nouveau;
             }
 
             //si le contact est alphabetiquement plus petit
