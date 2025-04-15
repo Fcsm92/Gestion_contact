@@ -24,7 +24,7 @@ struct contact
 
 class GestionnaireContacts {
  private:
-    Contac* teteListe;
+    Contact* teteListe;
     Contact* racineArbre;
 
     Contact* rechercheDsArbre(Contact* racine, const char*nom){
@@ -39,11 +39,11 @@ class GestionnaireContacts {
         return rechercheArbre(cmp<0 ? racine->gauche : racine->droite, nom);
     }
 
-    void supprimerContact(Contact *aSupprimer){
-        //recherche dans l'arbre
-        Contact *supprimer = rechercheDsArbre(racineArbre,nom);
-        if (!supprimer){
-            return false
+    void supprimerContactListe(Contact* aSupprimer){
+        if (!teteListe || !aSupprimer) return;
+        
+        if (teteListe==aSupprimer){
+            teteListe=teteListe->suivant;
         }
 
         //supprimer dans la liste
@@ -53,13 +53,53 @@ class GestionnaireContacts {
         if (aSupprimer->suivant){
             aSupprimer->suivant->precedent=aSupprimer->precedent;
         }
-        delete aSupprimer;
+    
     }
 
-    void supprimerContact(Contact *aSupprimer){
-        if (!teteListe || !aSupprimer) return;
-        
+
+    Contact* supprimerArbre(Contact* racine,const char* nom){
+        if (!racine) return nullptr;
+
+        int ctp=strcmp(nom, racine->nom);
+        if (cpt<0){
+            racine->gauche=supprimerArbre(racine->gauche,nom);
+        }
+        else if (cpt>0){
+            racine->droit=supprimerArbre(racine->droit,nom);
+
+        }
+        //si c'est le bon
+        else {
+            if (!racine->gauche){
+                Contact * temp = racine->droit;
+                return temp;
+            }
+            else if (!racine->droit){
+                Contact * temp = racine->gauche;
+                return temp;
+            }
+
+            //si deux enfant
+            Contact* temp= trouverMinimum(racine->droit);
+            strncpy(racine->nom, temp->nom);
+            strncpy(racine->prenom, temp->prenom);
+            strncpy(racine->mail, temp->mail);
+            strncpy(racine->telephone, temp->telephone);
+            racine->droit=supprimerArbre  (racine->droit, temp->nom);
+        }
+        return racine;
     }
+
+    Contact *trouverMinimum(Contact* noeud){
+
+        Contact* courant=noeud;
+        while (courant && courant->gauche){
+            courant=courant->gauche;
+        }
+        return courant;
+    }
+
+    
 
 
     public:
@@ -68,7 +108,7 @@ class GestionnaireContacts {
     void ajouterContact(const char* nom, const char* prenom, const char* mail, const char* telephone){
 
         // creation contact
-        Contact* c = new Contact();
+        Contact* nouveauc = new Contact();
         strncpy(nouveau->nom = nom, 49);
         strncpy(nouveau->prenom = prenom, 49);
         strncpy(nouveau->mail = mail, 99);
@@ -77,6 +117,7 @@ class GestionnaireContacts {
 
         //ajout tete de la liste et insertion dans l'arbre
         nouveau->suivant= teteListe;
+        *teteListe->precedent=nouveaux
         teteliste=nouveau;
 
         insertionDsArbre(racineArbre,nouveau);
@@ -105,6 +146,21 @@ class GestionnaireContacts {
 
 
 
+    
+
+
+    void supprimerContact(Contact char nom){
+        Contact *aSupprimer = rechercheDsArbre(racineArbre,nom);
+        if (!aSupprimer){
+            return false
+        }
+       supprimerContactListe(aSupprimer);
+
+
+       racineArbre=supprimerArbre(racineArbre,nom);
+
+       delete aSupprimer;
+       return true;
     }
 
 
