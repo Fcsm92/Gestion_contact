@@ -20,10 +20,11 @@ int main()
     gestionnaire.ajouterContact("Cartin", "Bob", "alice@gmail.com", "0629010954");
 
     gestionnaire.afficherArbre(3);
+    gestionnaire.afficherListe();
+    gestionnaire.supprimerContact("aartin");
 
-    gestionnaire.supprimerContact("aartin");
-    gestionnaire.supprimerContact("aartin");
     gestionnaire.afficherArbre(3);
+    gestionnaire.afficherListe();
 
 
 

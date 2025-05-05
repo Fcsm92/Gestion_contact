@@ -30,7 +30,27 @@ class GestionnaireContacts {
     Contact* teteListe;
     Contact* racineArbre;
 
+    Contact** conversionLenT(Contact* tete, int&taille) {
+        //compter le nombre de contact
+        taille=0;
+        Contact* courant =tete;
+        while (courant!=nullptr) {
+            taille++;
+            courant=courant->suivant;
+            }
 
+        // creation dynamique du tableau
+    Contact** tableau=new Contact *[taille];
+
+    //remplissage du tableau
+    courant=tete;
+    for (int i=0;i<taille;i++) {
+        tableau[i]=courant;
+        courant=courant->suivant;
+    }
+        return tableau;
+
+    }
     Contact* rechercheDsArbre(Contact* racine, const char*nom){
         //Si arbre vide
         if(!racine) return nullptr;
@@ -192,7 +212,13 @@ class GestionnaireContacts {
         }
 
 
-
+    void afficherListe() {
+        Contact* courant=teteListe;
+        while (courant!=nullptr) {
+            std::cout << courant->nom << "\n ";
+            courant=courant->suivant;
+        }
+    }
 
 
 
