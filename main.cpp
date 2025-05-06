@@ -1,5 +1,6 @@
 #include <iostream>
 #include "contact.cpp"
+
 using namespace std;
 
 int main()
@@ -25,6 +26,15 @@ int main()
 
     gestionnaire.afficherArbre(3);
     gestionnaire.afficherListe();
+
+
+    gestionnaire.triB();
+
+
+
+
+
+
 
 
 

@@ -6,6 +6,8 @@
 #include <ctime>
 
 
+
+
 struct Contact
 {
     char nom[50];
@@ -23,14 +25,24 @@ struct Contact
     Contact* droit;  //fils droit
 };
 
+static int compareNom(const Contact* a, const Contact* b) {
+    return _stricmp(a->nom, b->nom);
+}
 
+
+static void echanger(Contact** a, Contact**b) {
+    //adresse du contact du pointeur qui est pointer
+    Contact* temp=*a;
+    *a=*b;
+    *b=temp;
+}
 
 class GestionnaireContacts {
  private:
     Contact* teteListe;
     Contact* racineArbre;
 
-    Contact** conversionLenT(Contact* tete, int&taille) {
+    Contact** conversionLenT(Contact* tete, int& taille) {
         //compter le nombre de contact
         taille=0;
         Contact* courant =tete;
@@ -51,6 +63,142 @@ class GestionnaireContacts {
         return tableau;
 
     }
+
+
+    void majTtoL(Contact** tab,int taille) {
+        teteListe=tab[0];
+        tab[0]->precedent = nullptr;
+        for (int i=0;i<taille-1;i++) {
+            tab[i]->suivant=tab[i+1];
+            tab[i+1]->precedent=tab[i];
+        }
+        tab[taille-1]->suivant=nullptr;
+    }
+
+
+    //tri rapide
+    int partition(Contact** tab,int bas, int haut, int(*compare)(const Contact*,const Contact*)) {
+        // on prend pour pivot le dernier element
+        Contact * pivot=tab[haut];
+
+        //index du plus petit elem
+        int i=bas-1;
+
+        for (int j=bas;j<haut;j++) {
+            //si pivot plus grand
+            if (compare(tab[j],pivot)<0) {
+                i++;
+                echanger(&tab[i],&tab[j]);
+            }
+        }
+
+        //on met le pivot a la bonne place
+        echanger(&tab[i+1],&tab[haut]);
+
+        //on retourne la position du pivot
+        return i+1;
+
+    }
+
+    void triRapide(Contact** tab, int bas, int haut, int(*compare)(const Contact*,const Contact*)) {
+        if (bas<haut) {
+            //on trouve le pivot
+            int pivot=partition(tab,bas,haut,compare);
+            //on tri la moitie gauche
+            triRapide(tab,bas,pivot-1,compare);
+            //on tri la moitié bas
+            triRapide(tab,pivot+1,haut,compare);
+        }
+    }
+
+
+    // tri par bulle (O(n2) ou O(n)
+    void TriBulle() {
+        int taille=0;
+        Contact** tab=conversionLenT(teteListe,taille);
+        //On parcout la liste deux fois
+        for (int i=0;i<taille_1;i++) {
+            bool echanged=false;
+            //On parcout les élement cote a cotes n fois
+            for (int j=0;j<taille-1;j++) {
+                if (compareNom(tab[j],tab[j+1])>0) {
+                    Contact* temp=tab[j];
+                    tab[j]=tab[j+1];
+                    tab[j+1]=temp;
+
+                }
+            }
+            //Si la liste est deja trié
+            if (!echanged) break;
+        }
+        //affichage et mise a jour
+        majTtoL(tab,taille);
+        afficherListe();
+        delete [] tab;
+
+    }
+
+
+    //tri par fusion O(nlog(n))
+    void fusion(Contact** tab, int gauche, int milieu,int droite, int (*compare)(const Contact*,const Contact*)) {
+        //taille des sous tableaux
+        int tailleGauche=milieu-gauche+1;
+        int tailleDroite=droite-milieu;
+
+        //Création des sous tableaux
+        Contact** tabGauche=new Contact *[tailleGauche];
+        Contact** tabDroite=new Contact *[tailleDroite];
+
+        // copie dans les sous tableaux
+        for (int i=0;i<tailleGauche;i++) {
+            tabGauche[i]=tab[i+1];
+        }
+        for (int j=0;j<tailleDroite;j++) {
+            tabDroite[j]=tab[milieu+1+j];
+        }
+
+
+        int i=0, j=0, k=gauche;
+
+        //fusion des tableaux
+        //tant que un des sous tableaux n'est pas fini
+        while (i<tailleGauche && j<tailleDroite) {
+            // element du sous tableaux guache inférieur ou égale alors
+            if (compareNom(tabGauche[i],tabDroite[j])<=0) {
+                tab[k++]=tabGauche[i++];
+            }
+            else {
+                tab[k++]=tabDroite[j++];
+            }
+        }
+
+
+        //il faut maintenant ajouter les élément restant
+        while (i<tailleGauche) {
+            tab[k++]=tabGauche[i++];
+        }
+
+        while (j<tailleDroite) {
+            tab[k++]=tabDroite[j++];
+        }
+
+
+        //libération mémoire
+        delete [] tabGauche;
+        delete [] tabDroite;
+    }
+
+    void TriFusion(Contact** tab, int gauche, int droite, int(*compare)(const Contact*,const Contact*)) {
+        if (gauche<droite) {
+            int milieu=gauche+(droite-gauche)/2;
+
+            triFusion(tab,gauche,milieux,compare);
+            triFusion(tab,milieux+1,droite,compare);
+            fusion(tab,droite,milieu,droite,compare);
+        }
+    }
+
+
     Contact* rechercheDsArbre(Contact* racine, const char*nom){
         //Si arbre vide
         if(!racine) return nullptr;
@@ -131,6 +279,7 @@ class GestionnaireContacts {
 
 
 
+
     public:
     GestionnaireContacts() : teteListe(nullptr), racineArbre(nullptr) {}
 
@@ -178,6 +327,7 @@ class GestionnaireContacts {
         strcpy(nouveau->prenom, prenom);
         strcpy(nouveau->mail,mail);
         strcpy(nouveau->telephone, telephone);
+        nouveau->precedent = nullptr;
         nouveau->gauche= nouveau->droit= nouveau->suivant=nullptr;
 
         //ajout tete de la liste et insertion dans l'arbre
@@ -218,6 +368,8 @@ class GestionnaireContacts {
             std::cout << courant->nom << "\n ";
             courant=courant->suivant;
         }
+
+        std::cout << std::endl;
     }
 
 
@@ -271,7 +423,7 @@ class GestionnaireContacts {
         afficherHierarchique(racine->droit, niveau + 1);
 
         for (int i = 0; i < niveau; ++i)
-            std::cout << "    ";
+            std::cout << "         ";
 
         std::cout << "---" << racine->nom << std::endl;
 
@@ -279,5 +431,28 @@ class GestionnaireContacts {
     }
 
 
+    void trierNom(int choix) {
+
+        int taille;
+
+        Contact ** tab=conversionLenT(teteListe,taille);
+
+
+        triRapide(tab,0,taille-1,compareNom);
+
+        majTtoL(tab,taille);
+        afficherListe();
+        delete[] tab;
+    }
+
+
+
+
+
+
+
 
 };
+
+
+
